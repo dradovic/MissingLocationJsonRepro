@@ -10,36 +10,21 @@ using (var db = new MyDbContext())
         Address1 = "Jumpy Rd. 1",
         City = "Duville",
     };
-
     var boat1 = new Boat
     {
-        Passengers = [location],
+        Location = location,
     };
     var boat2 = new Boat
     { 
-        Passengers = [location],
+        Location = location,
     };
     var boat3 = new Boat
     {
-        Passengers = [location],
+        Location = location,
     };
     db.Boats.AddRange(boat1, boat2, boat3);
     db.SaveChanges();
-}
-
-using (var db = new MyDbContext())
-{
-    foreach (var boat in db.Boats)
-    {
-        Console.WriteLine(boat);
-        // Boat 8:
-        // Boat 9:
-        // Boat 10: Jumpy Rd. 1 in Duville
-        // Id	Passengers
-        // 8    []
-        // 9    []
-        // 10   [{ "Address1":"Jumpy Rd. 1","City":"Duville"}]
-    }
+    // SqlException: Cannot insert the value NULL into column 'Passenger', table 'MissingLocationJsonRepro.dbo.Boats'; column does not allow nulls.INSERT fails.
 }
 
 public class Location
@@ -52,8 +37,8 @@ public class Location
 public class Boat
 {
     public int Id { get; set; }
-    public ICollection<Location> Passengers { get; set; } = null!;
-    public override string ToString() => $"Boat {Id}: {string.Join(" ; ", Passengers)}";
+    public Location Location { get; set; } = null!;
+    public override string ToString() => $"Boat {Id}: {Location}";
 }
 
 public class MyDbContext : DbContext
@@ -67,7 +52,7 @@ public class MyDbContext : DbContext
         //builder.Owned<Location>();
 
         builder.Entity<Boat>()
-            .OwnsMany(b => b.Passengers).ToJson();
+            .OwnsOne(b => b.Location).ToJson();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
