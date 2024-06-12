@@ -64,7 +64,7 @@ public class MyDbContext : DbContext
     {
         base.OnModelCreating(builder);
 
-        builder.Owned<Location>();
+        //builder.Owned<Location>();
 
         builder.Entity<Boat>()
             .OwnsMany(b => b.Passengers).ToJson();
